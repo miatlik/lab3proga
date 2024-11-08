@@ -7,21 +7,42 @@
 #include <conio.h>
 #include <locale.h>
 #include <ctime>
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
 #define MAX_CARDS 11
 #define MAX_HAND 10
-typedef struct {
+
+class Card {
+private:
     int value; // Значение карты
-} Card;
-typedef struct {
-    Card hand[MAX_HAND]; // Массив карт игрока
+
+public:
+    Card(int val) : value(val) {}
+    int getValue() const { return value; }
+};
+
+class Player {
+private:
+    std::vector<Card*> hand; // Вектор для хранения указателей на карты
     int cardCount; // Количество карт в руке
-} Player;
+
+public:
+    Player() : cardCount(0) {}
+
+    ~Player() {
+        for (auto card : hand) {
+            delete card; // Освобождение памяти для каждой карты
+        }
+    }
 //Ввод игральной колоды с очками от 1 до 11
 void vvodkolodi(int arr[]) {
     for (int i = 0; i < MAX_CARDS; i++) {
         arr[i] = i + 1;
     }
 }
+
 //Случайный выбор карты из колоды(выбор числа из массива и удаление его из этого массива)
 int viborkarti(int arr[], int* size) {
     int ri, randc;
