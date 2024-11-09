@@ -70,110 +70,75 @@ public:
         for (auto card : hand) {
             delete card; // Освобождение памяти для каждой карты
         }
-    }  
-        void takeCard(int cardValue) {
-            if (cardCount < MAX_HAND) {
-                hand.push_back(new Card(cardValue)); // Динамическое выделение карты
-                cardCount++;
-            }
+    }
+    //Получение в руку игрока или противника карты
+    void ruka(int cardValue) {
+        if (cardCount < MAX_HAND) {
+            hand.push_back(new Card(cardValue)); // Динамическое выделение карты
+            cardCount++;
         }
-
-        void displayCards() const {
-            int sum = 0;
-            std::cout << "\nМои карты: ";
-            for (auto card : hand) {
-                std::cout << card->getValue() << ", "; // Получаем значение через указатель
-                sum += card->getValue();
-            }
-            std::cout << sum << "/21";
+    }
+    //Вывод руки игрока
+    void vivodrukamy() const {
+        int sum = 0;
+        std::cout << "\nМои карты: ";
+        for (auto card : hand) {
+            std::cout << card->getValue() << ", "; // Получаем значение через указатель
+            sum += card->getValue();
         }
-
-        int getTotalValue() const {
-            int sum = 0;
-            for (auto card : hand) {
-                sum += card->getValue();
-            }
-            return sum;
+        std::cout << sum << "/21";
+    }
+    //Вывод руки противника без первой карты
+    void vivodrukabotaclose() const {
+        int sum = 0;
+        std::cout << "\nКарты противника: ?, ";
+        for (int i = 1; i < cardCount; i++) {
+            std::cout << hand[i]->getValue() << ", "; // Получаем значение через указатель
+            sum += hand[i]->getValue();
         }
-
-        int getCardCount() const {
-            return cardCount;
+        std::cout << "? + " << sum << "/21";
+    }
+    //Вывод руки противника с первой картой
+    void vivodrukabotaopen() const {
+        int sum = 0;
+        std::cout << "\nКарты противника: ";
+        for (auto card : hand) {
+            std::cout << card->getValue() << ", "; // Получаем значение через указатель
+            sum += card->getValue();
         }
-    };
-//Ввод игральной колоды с очками от 1 до 11
-void vvodkolodi(int arr[]) {
-    for (int i = 0; i < MAX_CARDS; i++) {
-        arr[i] = i + 1;
+        std::cout << sum << "/21";
     }
-}
+    //Сумма очков противника или игрока
+    int gettotalvalue() const {
+        int sum = 0;
+        for (auto card : hand) {
+            sum += card->getValue();
+        }
+        return sum;
+    }
+    //Количество карт игрока или противника
+    int getcardcount() const {
+        return cardCount;
+    }
+    // Подсчет очков и вывод результата игры
+    void vivodreza(Player* player, Player* opponent) {
+        int sum1 = player->gettotalvalue();
+        int sum2 = opponent->gettotalvalue();
+        if (sum1 > 21 && sum2 < 22) std::cout << "\nУ вас перебор. Вы проиграли\n";
+        if (sum2 > 21 && sum1 < 22) std::cout << "\nУ противника перебор. Вы выиграли\n";
+        if (sum1 > 21 && sum2 > 21 && sum1 < sum2) std::cout << "\nУ вас и противника перебор.Вы выиграли, так как имеете меньше очков\n";
+        if (sum1 > 21 && sum2 > 21 && sum1 > sum2) std::cout << "\nУ вас и противника перебор.Вы проиграли, так как имеете больше очков\n";
+        if (sum1 < 22 && sum2 < 22 && sum1 < sum2) std::cout << "\nВы проиграли. Противник ближе к 21 очку\n";
+        if (sum1 < 22 && sum2 < 22 && sum1 > sum2) std::cout << "\nВы выиграли. Вы ближе к 21 очку\n";
+        if (sum1 == sum2) std::cout << "\nНичья\n";
+    }
+    //Простейший искусственный интелект для противника, который берет карту если у него меньше 17 очков
+    int reshenie_ai(Player* opponent) const {
+        int sum = opponent->gettotalvalue(); // Получаем сумму очков
+        return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
+    }
+};
 
-//Случайный выбор карты из колоды(выбор числа из массива и удаление его из этого массива)
-int viborkarti(int arr[], int* size) {
-    int ri, randc;
-    ri = rand() % *size;
-    randc = arr[ri];
-    for (int i = ri; i < *size - 1; i++) arr[i] = arr[i + 1];
-    (*size)--;
-    return randc;
-}
-//Взятие карты игроком 
-void rukamy(Player* player, int arr[], int* size) {
-    if (player->cardCount < MAX_HAND) {
-        player->hand[player->cardCount].value = viborkarti(arr, size);
-        player->cardCount++;
-    }
-}
-//Взятие карты противником
-void rukabota(Player* opponent, int arr[], int* size) {
-    if (opponent->cardCount < MAX_HAND) {
-        opponent->hand[opponent->cardCount].value = viborkarti(arr, size);
-        opponent->cardCount++;
-    }
-}
-//Вывод моих карт и их суммы очков
-void vivodrukamy(Player* player) {
-    int sum = 0;
-    printf("\nМои карты: ");
-    for (int i = 0; i < player->cardCount; i++) {
-        printf("%d, ", player->hand[i].value);
-        sum += player->hand[i].value;
-    }
-    printf("%d/21", sum);
-}
-//Вывод карт противника с учетом первой скрытой карты и суммы очков без первой карты
-void vivodrukabota(Player* opponent) {
-    int sum = 0;
-    printf("\nКарты противника: ?,  ");
-    for (int i = 1; i < opponent->cardCount; i++) {
-        printf("%d, ", opponent->hand[i].value);
-        sum += opponent->hand[i].value;
-    }
-    printf("?+%d/21", sum);
-}
-//Подсчет очков моих и противника и вывод результата игры
-void vivodreza(Player* player, Player* opponent) {
-    int sum1 = 0, sum2 = 0;
-    for (int i = 0; i < player->cardCount; i++)
-        sum1 += player->hand[i].value;
-    for (int i = 0; i < opponent->cardCount; i++)
-        sum2 += opponent->hand[i].value;
-    // Логика определения результата
-    if (sum1 > 21 && sum2 < 22) printf("У вас перебор. Вы проиграли\n");
-    if (sum2 > 21 && sum1 < 22) printf("У противника перебор. Вы выиграли\n");
-    if (sum1 > 21 && sum2 > 21 && sum1 < sum2) printf("У вас и противника перебор.Вы выиграли, так как имеете меньше очков\n");
-    if (sum1 > 21 && sum2 > 21 && sum1 > sum2) printf("У вас и противника перебор.Вы проиграли, так как имеете больше очков\n");
-    if (sum1 < 22 && sum2 < 22 && sum1 < sum2) printf("Вы проиграли. Противник ближе к 21 очку\n");
-    if (sum1 < 22 && sum2 < 22 && sum1 > sum2) printf("Вы выиграли. Вы ближе к 21 очку\n");
-    if (sum1 == sum2) printf("Ничья\n");
-}
-//Простейший искусственный интелект для противника, который берет карту если у него меньше 17 очков
-int reshenie_ai(Player* opponent) {
-    int sum = 0, randbot = 1;
-    for (int i = 0; i < opponent->cardCount; i++)
-        sum += opponent->hand[i].value;
-    if (sum < 17) randbot = 0;
-    return randbot;
-}
 int main() {
     setlocale(LC_ALL, "Rus");
     char ch;
