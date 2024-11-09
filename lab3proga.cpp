@@ -23,6 +23,41 @@ public:
     int getValue() const { return value; }
 };
 
+class Deck {
+private:
+    int cards[MAX_CARDS]; // Массив для хранения значений карт
+    int size; // Текущий размер колоды
+
+public:
+    Deck() {
+        vvodkolodi();
+    }
+
+    // Ввод игральной колоды с очками от 1 до 11
+    void vvodkolodi() {
+        for (int i = 0; i < MAX_CARDS; i++) {
+            cards[i] = i + 1;
+        }
+        size = MAX_CARDS; // Инициализация размера колоды
+    }
+
+    // Случайный выбор карты из колоды
+    int viborkarti() {
+        if (size <= 0) return -1; // Возвращаем невалидное значение
+        int ri = rand() % size;
+        int randc = cards[ri];
+        for (int i = ri; i < size - 1; i++) {
+            cards[i] = cards[i + 1];
+        }
+        size--;
+        return randc;
+    }
+    //Размер колоды
+    int getSize() const {
+        return size;
+    }
+};
+
 class Player {
 private:
     std::vector<Card*> hand; // Вектор для хранения указателей на карты
@@ -35,7 +70,36 @@ public:
         for (auto card : hand) {
             delete card; // Освобождение памяти для каждой карты
         }
-    }
+    }  
+        void takeCard(int cardValue) {
+            if (cardCount < MAX_HAND) {
+                hand.push_back(new Card(cardValue)); // Динамическое выделение карты
+                cardCount++;
+            }
+        }
+
+        void displayCards() const {
+            int sum = 0;
+            std::cout << "\nМои карты: ";
+            for (auto card : hand) {
+                std::cout << card->getValue() << ", "; // Получаем значение через указатель
+                sum += card->getValue();
+            }
+            std::cout << sum << "/21";
+        }
+
+        int getTotalValue() const {
+            int sum = 0;
+            for (auto card : hand) {
+                sum += card->getValue();
+            }
+            return sum;
+        }
+
+        int getCardCount() const {
+            return cardCount;
+        }
+    };
 //Ввод игральной колоды с очками от 1 до 11
 void vvodkolodi(int arr[]) {
     for (int i = 0; i < MAX_CARDS; i++) {
