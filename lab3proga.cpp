@@ -143,64 +143,57 @@ int main() {
     setlocale(LC_ALL, "Rus");
     char ch;
     do {
-        int arr[MAX_CARDS], n, sum, f1 = 1, f2 = 1, take, per = 0;
-        Player player = { player.cardCount = 0 }; // Инициализация игрока
-        Player opponent = { opponent.cardCount = 0 }; // Инициализация противника
-        srand(time(NULL));
-        sum = 0;
-        n = MAX_CARDS;
-        vvodkolodi(arr);
-        printf("\n");
-        //Начальная раздача карт и вывод того, что взяли
-        rukamy(&player, arr, &n);
-        rukamy(&player, arr, &n);
-        rukabota(&opponent, arr, &n);
-        rukabota(&opponent, arr, &n);
-        vivodrukamy(&player);
-        vivodrukabota(&opponent);
-        //Основная игра с возможностью брать карту или пасовать, противник также берет карту или пасует
+        int  f1 = 1, f2 = 1, take, per = 0;
+        Deck deck;
+
+        int arr[MAX_CARDS];
+        int size;
+        Player* player = new Player();   // Динамическое выделение игрока
+        Player* opponent = new Player(); // Динамическое выделение противника
+        srand(static_cast<unsigned int>(time(NULL)));
+        deck.vvodkolodi();
+        // Начальная раздача карт
+        player->ruka(deck.viborkarti());
+        player->ruka(deck.viborkarti());
+        opponent->ruka(deck.viborkarti());
+        opponent->ruka(deck.viborkarti());
+        player->vivodrukamy();
+        opponent->vivodrukabotaclose();
+        //Основная игра
         while (f1 == 1 || f2 == 1) {
             if (f1 == 1) {
-                printf("\nНажмите 1, чтобы тянуть карту\n");
-                printf("Нажмите 2, чтобы спасовать\n");
+                std::cout << "\nНажмите 1, чтобы тянуть карту\n";
+                std::cout << "Нажмите 2, чтобы спасовать\n";
                 while (scanf("%d", &take) != 1 || take < 1 || take > 2) {
                     while (getchar() != '\n');
-                    printf("Ошибка. Выберите 1 или 2: ");
+                    std::cout << "Ошибка. Выберите 1 или 2: ";
                 }
                 while (getchar() != '\n');
-                for (int i = 0; i < player.cardCount; i++)
-                    sum += player.hand[i].value;
-                if (sum > 21) per = 1;
-                sum = 0;
+                if (player->gettotalvalue() > 21) per = 1;
                 if (take == 1) {
-                    if (per == 0) rukamy(&player, arr, &n);
-                    else printf("Нельзя брать карту при переборе\n");
+                    if (per == 0) player->ruka(deck.viborkarti());
+                    else std::cout << "Нельзя брать карту при переборе";
                 }
                 else {
-                    printf("Вы спасовали");
+                    std::cout << "Вы спасовали";
                     f1 = 0;
                 }
             }
-            if (reshenie_ai(&opponent) == 0 && f2 == 1) rukabota(&opponent, arr, &n);
-            if (reshenie_ai(&opponent) == 1 && f2 == 1) {
-                printf("\nПротивник спасовал");
+            if (opponent->reshenie_ai(opponent) == 0 && f2 == 1) opponent->ruka(deck.viborkarti());
+            if (opponent->reshenie_ai(opponent) == 1 && f2 == 1) {
+                std::cout << "\nПротивник спасовал";
                 f2 = 0;
             }
-            vivodrukamy(&player);
-            if (f1 == 1) {
-                vivodrukabota(&opponent);
-            }
-            else {
-                sum = 0;
-                printf("\nКарты противника: ");
-                for (int i = 0; i < opponent.cardCount; i++)
-                    printf("%d, ", opponent.hand[i].value);
-                for (int i = 0; i < opponent.cardCount; i++) sum += opponent.hand[i].value;
-                printf("%d/21\n", sum);
-            }
-            if (f1 == 0 && f2 == 0) vivodreza(&player, &opponent);
+            player->vivodrukamy();
+            if (f1 == 1) opponent->vivodrukabotaclose();
+            else opponent->vivodrukabotaopen();
+            if (f1 == 0 && f2 == 0) player->vivodreza(player, opponent);
         }
-        puts("\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n\n");
+        // Освобождение памяти
+        delete player;
+        delete opponent;
+
+        std::cout << "\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n";
     } while ((ch = _getch()) != 'q');
 }
 
