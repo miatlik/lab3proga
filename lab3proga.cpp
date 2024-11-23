@@ -106,7 +106,7 @@ public:
             std::cout << card->getValue() << ", "; // Получаем значение через указатель
             sum += card->getValue();
         }
-        std::cout << sum << "/21";
+        std::cout << sum << "/21\n";
     }
     //Сумма очков противника или игрока
     int gettotalvalue() const {
@@ -137,6 +137,16 @@ public:
         int sum = opponent->gettotalvalue(); // Получаем сумму очков
         return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
     }
+    // Возвращает сумму очков через ссылку
+    const int& getScoreReference() const {
+        return gettotalvalue(); // Возвращаем сумму очков по ссылке
+    }
+    // Возвращает сумму очков через указатель
+    const int* getScorePointer() const {
+        int* score = new int(gettotalvalue()); // Динамически выделяем память для значения
+        return score; // Возвращаем указатель на сумму
+    }
+
 };
 
 int main() {
@@ -145,19 +155,22 @@ int main() {
     do {
         int  f1 = 1, f2 = 1, take, per = 0;
         Deck deck;
-
-        int arr[MAX_CARDS];
-        int size;
-        Player* player = new Player();   // Динамическое выделение игрока
+        Player player;
         Player* opponent = new Player(); // Динамическое выделение противника
         srand(static_cast<unsigned int>(time(NULL)));
         deck.vvodkolodi();
         // Начальная раздача карт
-        player->ruka(deck.viborkarti());
-        player->ruka(deck.viborkarti());
+        player.ruka(deck.viborkarti());
+        player.ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
-        player->vivodrukamy();
+        // Получение суммы очков через ссылку
+        const int& scoreRef = player.getScoreReference();
+        std::cout << "\nСумма очков через ссылку: " << scoreRef << std::endl;
+        // Получение суммы очков через указатель
+        const int* scorePtr = player.getScorePointer();
+        std::cout << "\nСумма очков через указатель: " << *scorePtr << std::endl;
+        player.vivodrukamy();
         opponent->vivodrukabotaclose();
         //Основная игра
         while (f1 == 1 || f2 == 1) {
@@ -169,9 +182,9 @@ int main() {
                     std::cout << "Ошибка. Выберите 1 или 2: ";
                 }
                 while (getchar() != '\n');
-                if (player->gettotalvalue() > 21) per = 1;
+                if (player.gettotalvalue() > 21) per = 1;
                 if (take == 1) {
-                    if (per == 0) player->ruka(deck.viborkarti());
+                    if (per == 0) player.ruka(deck.viborkarti());
                     else std::cout << "Нельзя брать карту при переборе";
                 }
                 else {
@@ -184,13 +197,13 @@ int main() {
                 std::cout << "\nПротивник спасовал";
                 f2 = 0;
             }
-            player->vivodrukamy();
+            player.vivodrukamy();
             if (f1 == 1) opponent->vivodrukabotaclose();
             else opponent->vivodrukabotaopen();
-            if (f1 == 0 && f2 == 0) player->vivodreza(player, opponent);
+            if (f1 == 0 && f2 == 0) player.vivodreza(&player, opponent);
         }
         // Освобождение памяти
-        delete player;
+        delete scorePtr;
         delete opponent;
 
         std::cout << "\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n";
