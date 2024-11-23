@@ -78,16 +78,8 @@ public:
             cardCount++;
         }
     }
-    //Вывод руки игрока
-    void vivodrukamy() const {
-        int sum = 0;
-        std::cout << "\nМои карты: ";
-        for (auto card : hand) {
-            std::cout << card->getValue() << ", "; // Получаем значение через указатель
-            sum += card->getValue();
-        }
-        std::cout << sum << "/21";
-    }
+    // Дружественная функция для вывода информации о игроке
+    friend void printPlayerInfo(const Player& player);
     //Вывод руки противника без первой карты
     void vivodrukabotaclose() const {
         int sum = 0;
@@ -148,7 +140,15 @@ public:
     }
 
 };
-
+// Дружественная функция для вывода информации о игроке
+void printPlayerInfo(const Player& player) {
+    int sum = player.gettotalvalue();
+    std::cout << "\nМои карты: ";
+    for (auto card : player.hand) {
+        std::cout << card->getValue() << ", ";// Получаем значение через указатель
+    }
+    std::cout << sum << "/21";
+}
 int main() {
     setlocale(LC_ALL, "Rus");
     char ch;
@@ -170,7 +170,7 @@ int main() {
         // Получение суммы очков через указатель
         const int* scorePtr = player.getScorePointer();
         std::cout << "\nСумма очков через указатель: " << *scorePtr << std::endl;
-        player.vivodrukamy();
+        printPlayerInfo(player);
         opponent->vivodrukabotaclose();
         //Основная игра
         while (f1 == 1 || f2 == 1) {
@@ -197,7 +197,8 @@ int main() {
                 std::cout << "\nПротивник спасовал";
                 f2 = 0;
             }
-            player.vivodrukamy();
+            // Используем дружественную функцию для отображения информации о игроке
+            printPlayerInfo(player);
             if (f1 == 1) opponent->vivodrukabotaclose();
             else opponent->vivodrukabotaopen();
             if (f1 == 0 && f2 == 0) player.vivodreza(&player, opponent);
