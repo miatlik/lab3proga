@@ -80,6 +80,15 @@ public:
     }
     // Дружественная функция для вывода информации о игроке
     friend void printPlayerInfo(const Player& player);
+    // Перегрузка оператора вывода для Player
+    friend std::ostream& operator<<(std::ostream& os, const Player& player) {
+        os << "Карты игрока: ";
+        for (auto card : player.hand) {
+            os << card->getValue() << ", "; // Получаем значение через указатель
+        }
+        os << player.gettotalvalue() << "/21\n";
+        return os;
+    }
     //Вывод руки противника без первой карты
     void vivodrukabotaclose() const {
         int sum = 0;
@@ -142,12 +151,7 @@ public:
 };
 // Дружественная функция для вывода информации о игроке
 void printPlayerInfo(const Player& player) {
-    int sum = player.gettotalvalue();
-    std::cout << "\nМои карты: ";
-    for (auto card : player.hand) {
-        std::cout << card->getValue() << ", ";// Получаем значение через указатель
-    }
-    std::cout << sum << "/21";
+    std::cout << player; // Используем перегруженный оператор << для вывода
 }
 int main() {
     setlocale(LC_ALL, "Rus");
@@ -185,16 +189,16 @@ int main() {
                 if (player.gettotalvalue() > 21) per = 1;
                 if (take == 1) {
                     if (per == 0) player.ruka(deck.viborkarti());
-                    else std::cout << "Нельзя брать карту при переборе";
+                    else std::cout << "Нельзя брать карту при переборе\n";
                 }
                 else {
-                    std::cout << "Вы спасовали";
+                    std::cout << "Вы спасовали\n";
                     f1 = 0;
                 }
             }
             if (opponent->reshenie_ai(opponent) == 0 && f2 == 1) opponent->ruka(deck.viborkarti());
             if (opponent->reshenie_ai(opponent) == 1 && f2 == 1) {
-                std::cout << "\nПротивник спасовал";
+                std::cout << "\nПротивник спасовал\n";
                 f2 = 0;
             }
             // Используем дружественную функцию для отображения информации о игроке
