@@ -71,6 +71,12 @@ public:
             delete card; // Освобождение памяти для каждой карты
         }
     }
+    //Конструктор копирования
+    Player(const Player& other) : cardCount(other.cardCount) {
+        for (auto card : other.hand) {
+            hand.push_back(new Card(card->getValue())); // Копируем каждую карту
+        }
+    }
     //Получение в руку игрока или противника карты
     void ruka(int cardValue) {
         if (cardCount < MAX_HAND) {
@@ -168,6 +174,7 @@ int main() {
         player.ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
+
         // Получение суммы очков через ссылку
         const int& scoreRef = player.getScoreReference();
         std::cout << "\nСумма очков через ссылку: " << scoreRef << std::endl;
@@ -175,6 +182,10 @@ int main() {
         const int* scorePtr = player.getScorePointer();
         std::cout << "\nСумма очков через указатель: " << *scorePtr << std::endl;
         printPlayerInfo(player);
+        //Использование конструктора копии на примере карт игрока
+        std::cout << "Копии карт игрока, сделанные с помощью конструктора копии: ";
+        Player player2 = player;
+        printPlayerInfo(player2);
         opponent->vivodrukabotaclose();
         //Основная игра
         while (f1 == 1 || f2 == 1) {
