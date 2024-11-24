@@ -77,7 +77,7 @@ public:
             hand.push_back(new Card(card->getValue())); // Копируем каждую карту
         }
     }
-    // Перегрузка оператора присваивания
+    //  Перегрузка оператора присваивания
     Player& operator=(const Player& other) {
         if (this == &other) { // Проверка на самоприсваивание
             return *this;
