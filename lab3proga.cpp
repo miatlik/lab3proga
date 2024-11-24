@@ -77,6 +77,26 @@ public:
             hand.push_back(new Card(card->getValue())); // Копируем каждую карту
         }
     }
+    // Перегрузка оператора присваивания
+    Player& operator=(const Player& other) {
+        if (this == &other) { // Проверка на самоприсваивание
+            return *this;
+        }
+
+        // Освобождение памяти предыдущих карт
+        for (auto card : hand) {
+            delete card;
+        }
+        hand.clear(); // Очистка вектора карт
+        cardCount = other.cardCount; // Копируем количество карт
+
+        // Копируем карты из другого игрока
+        for (auto card : other.hand) {
+            hand.push_back(new Card(card->getValue())); // Глубокое копирование карт
+        }
+
+        return *this; // Возвращаем текущий объект
+    }
     //Получение в руку игрока или противника карты
     void ruka(int cardValue) {
         if (cardCount < MAX_HAND) {
@@ -186,6 +206,11 @@ int main() {
         std::cout << "Копии карт игрока, сделанные с помощью конструктора копии: ";
         Player player2 = player;
         printPlayerInfo(player2);
+        //Использование перегруженного оператора присваивания 
+        std::cout << "Копии карт игрока, сделанные с помощью перегруженного оператора присваивания: ";
+        Player player3;
+        player3 = player;
+        printPlayerInfo(player3);
         opponent->vivodrukabotaclose();
         //Основная игра
         while (f1 == 1 || f2 == 1) {
