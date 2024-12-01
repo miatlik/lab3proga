@@ -14,6 +14,18 @@
 #define MAX_CARDS 11
 #define MAX_HAND 10
 
+// Исключение для переполнения колоды
+class DeckOverflowException : public std::runtime_error {
+public:
+    DeckOverflowException() : std::runtime_error("Ошибка: Переполнение колоды карт.") {}
+};
+
+// Исключение для переполнения руки игрока
+class HandOverflowException : public std::runtime_error {
+public:
+    HandOverflowException() : std::runtime_error("Ошибка: Переполнение руки игрока.") {}
+};
+
 class Card {
 private:
     int value; // Значение карты
@@ -30,11 +42,19 @@ private:
 
 public:
     Deck() {
-        vvodkolodi();
+        try {
+            vvodkolodi();
+        }
+        catch (const DeckOverflowException& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     // Ввод игральной колоды с очками от 1 до 11
     void vvodkolodi() {
+        if (MAX_CARDS > 11) {
+            throw DeckOverflowException(); // Генерация исключения, если максимальное количество карт превышает 11
+        }
         for (int i = 0; i < MAX_CARDS; i++) {
             cards[i] = i + 1;
         }
@@ -99,9 +119,15 @@ public:
     }
     //Получение в руку игрока или противника карты
     void ruka(int cardValue) {
-        if (cardCount < MAX_HAND) {
+        try {
+            if (cardCount >= MAX_HAND) { // Проверка переполнения руки
+                throw HandOverflowException(); // Генерация исключения, если рука полна
+            }
             hand.push_back(new Card(cardValue)); // Динамическое выделение карты
             cardCount++;
+        }
+        catch (const HandOverflowException& e) {
+            std::cerr << e.what() << std::endl; // Вывод сообщения об ошибке
         }
     }
     // Дружественная функция для вывода информации о игроке
@@ -188,6 +214,7 @@ int main() {
         Player player;
         Player* opponent = new Player(); // Динамическое выделение противника
         srand(static_cast<unsigned int>(time(NULL)));
+
         deck.vvodkolodi();
         // Начальная раздача карт
         player.ruka(deck.viborkarti());
