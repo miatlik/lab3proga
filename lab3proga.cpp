@@ -39,6 +39,7 @@ class Deck {
 private:
     int cards[MAX_CARDS]; // Массив для хранения значений карт
     int size; // Текущий размер колоды
+    static int totalDecksCreated; // Статическое поле для подсчета созданных колод
 
 public:
     Deck() {
@@ -48,6 +49,7 @@ public:
         catch (const DeckOverflowException& e) {
             std::cerr << e.what() << std::endl;
         }
+        totalDecksCreated++; // Увеличиваем количество созданных колод
     }
 
     // Ввод игральной колоды с очками от 1 до 11
@@ -59,6 +61,10 @@ public:
             cards[i] = i + 1;
         }
         size = MAX_CARDS; // Инициализация размера колоды
+    }
+    // Метод для получения общего количества созданных колод
+    static int getTotalDecksCreated() {
+        return totalDecksCreated;
     }
 
     // Случайный выбор карты из колоды
@@ -77,7 +83,7 @@ public:
         return size;
     }
 };
-
+int Deck::totalDecksCreated = 0;
 class Player {
 private:
     std::vector<Card*> hand; // Вектор для хранения указателей на карты
@@ -221,7 +227,8 @@ int main() {
         player.ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
         opponent->ruka(deck.viborkarti());
-
+        // Вывод общего количества созданных колод
+        std::cout << "Общее количество созданных колод: " << Deck::getTotalDecksCreated() << std::endl;
         // Получение суммы очков через ссылку
         const int& scoreRef = player.getScoreReference();
         std::cout << "\nСумма очков через ссылку: " << scoreRef << std::endl;
