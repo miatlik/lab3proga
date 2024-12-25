@@ -85,7 +85,7 @@ public:
 };
 int Deck::totalDecksCreated = 0;
 class Player {
-private:
+protected:
     std::vector<Card*> hand; // Вектор для хранения указателей на карты
     int cardCount; // Количество карт в руке
 
@@ -157,16 +157,6 @@ public:
         }
         std::cout << "? + " << sum << "/21";
     }
-    //Вывод руки противника с первой картой
-    void vivodrukabotaopen() const {
-        int sum = 0;
-        std::cout << "\nКарты противника: ";
-        for (auto card : hand) {
-            std::cout << card->getValue() << ", "; // Получаем значение через указатель
-            sum += card->getValue();
-        }
-        std::cout << sum << "/21\n";
-    }
     //Сумма очков противника или игрока
     int gettotalvalue() const {
         int sum = 0;
@@ -210,6 +200,16 @@ public:
     bool decideToHit(Player* opponent) const {
         int sum = opponent->gettotalvalue(); // Получаем сумму очков
         return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
+    }
+    // Метод для отображения текущих карт AIPlayer с первой картой
+    void vivodrukabotaopen() const {
+        int sum = 0;
+        std::cout << "\nКарты противника: ";
+        for (auto card : hand) {
+            std::cout << card->getValue() << ", "; // Получаем значение через указатель
+            sum += card->getValue();
+        }
+        std::cout << sum << "/21\n";
     }
 };
 // Дружественная функция для вывода информации о игроке
