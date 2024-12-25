@@ -84,7 +84,21 @@ public:
     }
 };
 int Deck::totalDecksCreated = 0;
-class Player {
+// Абстрактный класс для игровых сущностей
+class GameEntity {
+public:
+    virtual ~GameEntity() = default; // Виртуальный деструктор
+
+    // Чисто виртуальная функция для взятия карты
+    virtual void takeCard(Deck& deck) = 0;
+
+    // Чисто виртуальная функция для получения суммы очков
+    virtual int getTotalValue() const = 0;
+
+    // Чисто виртуальная функция для вывода информации о сущности
+    virtual void printInfo() const = 0;
+};
+class Player : public GameEntity {
 protected:
     std::vector<Card*> hand; // Вектор для хранения указателей на карты
     int cardCount; // Количество карт в руке
@@ -106,6 +120,17 @@ public:
         else {
             std::cerr << "Ошибка: Колода пуста, не удается взять карту." << std::endl;
         }
+    }
+    
+
+    // Переопределение функции для получения суммы очков
+    int getTotalValue() const override {
+        return gettotalvalue();
+    }
+
+    // Переопределение функции для вывода информации о игроке
+    void printInfo() const override {
+        std::cout << *this; // Используем перегруженный оператор << для вывода
     }
     //Конструктор копирования
     Player(const Player& other) : cardCount(other.cardCount) {
@@ -215,7 +240,16 @@ public:
             std::cout << "AIPlayer решил не брать карту." << std::endl;
         }
     }
+    // Переопределение функции для получения суммы очков
+    int getTotalValue() const override {
+        return gettotalvalue();
+    }
 
+    // Переопределение функции для вывода информации о AIPlayer
+    void printInfo() const override {
+        std::cout << "AIPlayer: ";
+        Player::printInfo(); // Вывод информации о руке
+    }
     // Конструктор копирования
     AIPlayer(const AIPlayer& other) : Player(other) {} // Вызов конструктора копирования базового класса
 
