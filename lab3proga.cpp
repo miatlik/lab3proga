@@ -191,11 +191,6 @@ public:
         if (sum1 < 22 && sum2 < 22 && sum1 > sum2) std::cout << "\nВы выиграли. Вы ближе к 21 очку\n";
         if (sum1 == sum2) std::cout << "\nНичья\n";
     }
-    //Простейший искусственный интелект для противника, который берет карту если у него меньше 17 очков
-    int reshenie_ai(Player* opponent) const {
-        int sum = opponent->gettotalvalue(); // Получаем сумму очков
-        return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
-    }
     // Возвращает сумму очков через ссылку
     const int& getScoreReference() const {
         return gettotalvalue(); // Возвращаем сумму очков по ссылке
@@ -206,6 +201,16 @@ public:
         return score; // Возвращаем указатель на сумму
     }
 
+};
+class AIPlayer : public Player {
+public:
+    AIPlayer() : Player() {}
+
+    // Метод для принятия решения о том, стоит ли брать карту
+    bool decideToHit(Player* opponent) const {
+        int sum = opponent->gettotalvalue(); // Получаем сумму очков
+        return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
+    }
 };
 // Дружественная функция для вывода информации о игроке
 void printPlayerInfo(const Player& player) {
@@ -218,7 +223,7 @@ int main() {
         int  f1 = 1, f2 = 1, take, per = 0;
         Deck deck;
         Player player;
-        Player* opponent = new Player(); // Динамическое выделение противника
+        AIPlayer* opponent = new AIPlayer(); // Динамическое выделение противника
         srand(static_cast<unsigned int>(time(NULL)));
 
         deck.vvodkolodi();
@@ -266,8 +271,8 @@ int main() {
                     f1 = 0;
                 }
             }
-            if (opponent->reshenie_ai(opponent) == 0 && f2 == 1) opponent->ruka(deck.viborkarti());
-            if (opponent->reshenie_ai(opponent) == 1 && f2 == 1) {
+            if (opponent->decideToHit(opponent) == 0 && f2 == 1) opponent->ruka(deck.viborkarti());
+            if (opponent->decideToHit(opponent) == 1 && f2 == 1) {
                 std::cout << "\nПротивник спасовал\n";
                 f2 = 0;
             }
