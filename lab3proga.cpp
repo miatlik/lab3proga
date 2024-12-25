@@ -124,7 +124,7 @@ public:
         return *this; // Возвращаем текущий объект
     }
     //Получение в руку игрока или противника карты
-    void ruka(int cardValue) {
+    virtual void ruka(int cardValue) {
         try {
             if (cardCount >= MAX_HAND) { // Проверка переполнения руки
                 throw HandOverflowException(); // Генерация исключения, если рука полна
@@ -201,6 +201,22 @@ public:
         int sum = opponent->gettotalvalue(); // Получаем сумму очков
         return (sum < 17) ? 0 : 1; // Возвращаем 0 (взять карту) или 1 (остановиться)
     }
+    // Перегруженный метод ruka, который вызывает метод базового класса
+    void ruka(int cardValue) override {
+        Player::ruka(cardValue); // Вызов метода базового класса
+    }
+
+    // Перегруженный метод ruka, который не вызывает метод базового класса
+    void ruka(Deck& deck) {
+        int cardValue = deck.viborkarti(); // Получаем случайную карту из колоды
+        if (cardValue != -1) {
+            hand.push_back(new Card(cardValue)); // Добавляем указатель на карту напрямую
+            cardCount++; // Увеличиваем количество карт
+        }
+        else {
+            std::cerr << "Ошибка: Колода пуста, не удается взять карту." << std::endl;
+        }
+    }
     // Метод для отображения текущих карт AIPlayer с первой картой
     void vivodrukabotaopen() const {
         int sum = 0;
@@ -230,7 +246,8 @@ int main() {
         // Начальная раздача карт
         player.ruka(deck.viborkarti());
         player.ruka(deck.viborkarti());
-        opponent->ruka(deck.viborkarti());
+        int cardValue = deck.viborkarti(); // Получаем значение карты из колоды
+        opponent->ruka(cardValue); // Вызываем метод ruka(int cardValue) для противника
         opponent->ruka(deck.viborkarti());
         // Вывод общего количества созданных колод
         std::cout << "Общее количество созданных колод: " << Deck::getTotalDecksCreated() << std::endl;
@@ -271,7 +288,7 @@ int main() {
                     f1 = 0;
                 }
             }
-            if (opponent->decideToHit(opponent) == 0 && f2 == 1) opponent->ruka(deck.viborkarti());
+            if (opponent->decideToHit(opponent) == 0 && f2 == 1) opponent->ruka(deck);// Используем перегруженный метод ruka с Deck
             if (opponent->decideToHit(opponent) == 1 && f2 == 1) {
                 std::cout << "\nПротивник спасовал\n";
                 f2 = 0;
