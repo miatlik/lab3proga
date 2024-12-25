@@ -97,6 +97,16 @@ public:
             delete card; // Освобождение памяти для каждой карты
         }
     }
+    // Виртуальная функция для взятия карты
+    virtual void takeCard(Deck& deck) {
+        int cardValue = deck.viborkarti(); // Получаем карту из колоды
+        if (cardValue != -1) {
+            ruka(cardValue); // Используем метод ruka для добавления карты в руку
+        }
+        else {
+            std::cerr << "Ошибка: Колода пуста, не удается взять карту." << std::endl;
+        }
+    }
     //Конструктор копирования
     Player(const Player& other) : cardCount(other.cardCount) {
         for (auto card : other.hand) {
@@ -196,6 +206,16 @@ class AIPlayer : public Player {
 public:
     AIPlayer() : Player() {}
 
+    // Переопределение виртуальной функции takeCard
+    void takeCard(Deck& deck) override {
+        if (decideToHit(this) == 0) {
+            Player::takeCard(deck); // Вызываем метод базового класса
+        }
+        else {
+            std::cout << "AIPlayer решил не брать карту." << std::endl;
+        }
+    }
+
     // Конструктор копирования
     AIPlayer(const AIPlayer& other) : Player(other) {} // Вызов конструктора копирования базового класса
 
@@ -258,14 +278,18 @@ int main() {
 
         deck.vvodkolodi();
         // Начальная раздача карт
-        player.ruka(deck.viborkarti());
+        // Демонстрация вызова виртуальной функции
+        std::cout << "Игрок берет карту." << std::endl;
+        player.takeCard(deck); // Вызов takeCard для игрока
         player.ruka(deck.viborkarti());
         int cardValue = deck.viborkarti(); // Получаем значение карты из колоды
         opponent->ruka(cardValue); // Вызываем метод ruka(int cardValue) для противника
-        opponent->ruka(deck.viborkarti());
+        std::cout << "AIPlayer берет карту." << std::endl;
+        opponent->takeCard(deck); // Вызов takeCard для AIPlayer
         // Использование оператора присваивания из AIPlayer
         opponent3 = *opponent; // Копирование данных из opponent в opponent2
         opponent2.ruka(deck.viborkarti());//Добавил карту в руку скопированного противника
+
         // Вывод общего количества созданных колод
         std::cout << "Общее количество созданных колод: " << Deck::getTotalDecksCreated() << std::endl;
         // Получение суммы очков через ссылку
@@ -305,9 +329,9 @@ int main() {
                     f1 = 0;
                 }
             }
-            if (opponent->decideToHit(opponent) == 0 && f2 == 1) opponent->ruka(deck);// Используем перегруженный метод ruka с Deck
+            if (opponent->decideToHit(opponent) == 0 && f2 == 1) opponent->takeCard(deck);
             if (opponent->decideToHit(opponent) == 1 && f2 == 1) {
-                std::cout << "\nПротивник спасовал\n";
+                opponent->takeCard(deck); // Вызов takeCard для AIPlayer
                 f2 = 0;
             }
             // Используем дружественную функцию для отображения информации о игроке
