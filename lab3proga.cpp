@@ -196,6 +196,9 @@ class AIPlayer : public Player {
 public:
     AIPlayer() : Player() {}
 
+    // Конструктор копирования
+    AIPlayer(const AIPlayer& other) : Player(other) {} // Вызов конструктора копирования базового класса
+
     // Метод для принятия решения о том, стоит ли брать карту
     bool decideToHit(Player* opponent) const {
         int sum = opponent->gettotalvalue(); // Получаем сумму очков
@@ -240,6 +243,7 @@ int main() {
         Deck deck;
         Player player;
         AIPlayer* opponent = new AIPlayer(); // Динамическое выделение противника
+        AIPlayer opponent2 = *opponent;// Используем конструктор копирования в классе AIPlayer для создания второго противника
         srand(static_cast<unsigned int>(time(NULL)));
 
         deck.vvodkolodi();
@@ -249,6 +253,7 @@ int main() {
         int cardValue = deck.viborkarti(); // Получаем значение карты из колоды
         opponent->ruka(cardValue); // Вызываем метод ruka(int cardValue) для противника
         opponent->ruka(deck.viborkarti());
+        opponent2.ruka(deck.viborkarti());//Добавил карту в руку скопированного противника
         // Вывод общего количества созданных колод
         std::cout << "Общее количество созданных колод: " << Deck::getTotalDecksCreated() << std::endl;
         // Получение суммы очков через ссылку
