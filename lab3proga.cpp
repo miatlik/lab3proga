@@ -260,6 +260,15 @@ public:
         std::cout << "AIPlayer: ";
         Player::printInfo(); // Вывод информации о руке
     }
+    // Метод для поиска карты в руке игрока
+    bool hasCard(int value) const {
+        for (const auto& card : hand) {
+            if (card->getValue() == value) {
+                return true; // Карта найдена
+            }
+        }
+        return false; // Карта не найдена
+    }
     // Конструктор копирования
     AIPlayer(const AIPlayer& other) : Player(other) {} // Вызов конструктора копирования базового класса
 
