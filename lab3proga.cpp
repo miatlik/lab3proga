@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <algorithm>
 #define MAX_CARDS 11
 #define MAX_HAND 10
 
@@ -111,17 +112,24 @@ public:
             delete card; // Освобождение памяти для каждой карты
         }
     }
+    // Метод для сортировки карт игрока
+    void sortHand() {
+        std::sort(hand.begin(), hand.end(), [](Card* a, Card* b) {
+            return a->getValue() < b->getValue();
+            });
+    }
     // Виртуальная функция для взятия карты
     virtual void takeCard(Deck& deck) {
         int cardValue = deck.viborkarti(); // Получаем карту из колоды
         if (cardValue != -1) {
             ruka(cardValue); // Используем метод ruka для добавления карты в руку
+            sortHand(); // Сортируем карты после добавления новой
         }
         else {
             std::cerr << "Ошибка: Колода пуста, не удается взять карту." << std::endl;
         }
     }
-    
+
 
     // Переопределение функции для получения суммы очков
     int getTotalValue() const override {
@@ -167,9 +175,11 @@ public:
             hand.push_back(new Card(cardValue)); // Динамическое выделение карты
             cardCount++;
         }
+
         catch (const HandOverflowException& e) {
             std::cerr << e.what() << std::endl; // Вывод сообщения об ошибке
         }
+        sortHand(); // Сортируем карты после добавления новой
     }
     // Дружественная функция для вывода информации о игроке
     friend void printPlayerInfo(const Player& player);
