@@ -323,43 +323,47 @@ int main() {
     do {
         int  f1 = 1, f2 = 1, take, per = 0;
         Deck deck;
-        Player player;
-        AIPlayer* opponent = new AIPlayer(); // Динамическое выделение противника
-        AIPlayer opponent2 = *opponent;// Используем конструктор копирования в классе AIPlayer для создания второго противника
-        AIPlayer opponent3;
+
+        // Создаем контейнер для хранения указателей на GameEntity
+        std::vector<std::unique_ptr<GameEntity>> players;
+
+        // Добавляем игрока и противника в контейнер
+        players.push_back(std::make_unique<Player>());
+        players.push_back(std::make_unique<AIPlayer>());
+
+        // Получаем указатель на игрока и противника
+        Player* player = dynamic_cast<Player*>(players[0].get());
+        AIPlayer* opponent = dynamic_cast<AIPlayer*>(players[1].get());
         srand(static_cast<unsigned int>(time(NULL)));
 
         deck.vvodkolodi();
         // Начальная раздача карт
         // Демонстрация вызова виртуальной функции
         std::cout << "Игрок берет карту." << std::endl;
-        player.takeCard(deck); // Вызов takeCard для игрока
-        player.ruka(deck.viborkarti());
+        player->takeCard(deck); // Вызов takeCard для игрока
+        player->ruka(deck.viborkarti());
         int cardValue = deck.viborkarti(); // Получаем значение карты из колоды
         opponent->ruka(cardValue); // Вызываем метод ruka(int cardValue) для противника
         std::cout << "AIPlayer берет карту." << std::endl;
         opponent->takeCard(deck); // Вызов takeCard для AIPlayer
-        // Использование оператора присваивания из AIPlayer
-        opponent3 = *opponent; // Копирование данных из opponent в opponent2
-        opponent2.ruka(deck.viborkarti());//Добавил карту в руку скопированного противника
 
         // Вывод общего количества созданных колод
         std::cout << "Общее количество созданных колод: " << Deck::getTotalDecksCreated() << std::endl;
         // Получение суммы очков через ссылку
-        const int& scoreRef = player.getScoreReference();
+        const int& scoreRef = player->getScoreReference();
         std::cout << "\nСумма очков через ссылку: " << scoreRef << std::endl;
         // Получение суммы очков через указатель
-        const int* scorePtr = player.getScorePointer();
+        const int* scorePtr = player->getScorePointer();
         std::cout << "\nСумма очков через указатель: " << *scorePtr << std::endl;
-        printPlayerInfo(player);
+        printPlayerInfo(*player);
         //Использование конструктора копии на примере карт игрока
         std::cout << "Копии карт игрока, сделанные с помощью конструктора копии: ";
-        Player player2 = player;
+        Player player2 = *player;
         printPlayerInfo(player2);
         //Использование перегруженного оператора присваивания 
         std::cout << "Копии карт игрока, сделанные с помощью перегруженного оператора присваивания: ";
         Player player3;
-        player3 = player;
+        player3 = *player;
         printPlayerInfo(player3);
         opponent->vivodrukabotaclose();
         //Основная игра
@@ -372,9 +376,9 @@ int main() {
                     std::cout << "Ошибка. Выберите 1 или 2: ";
                 }
                 while (getchar() != '\n');
-                if (player.gettotalvalue() > 21) per = 1;
+                if (player->gettotalvalue() > 21) per = 1;
                 if (take == 1) {
-                    if (per == 0) player.ruka(deck.viborkarti());
+                    if (per == 0) player->ruka(deck.viborkarti());
                     else std::cout << "Нельзя брать карту при переборе\n";
                 }
                 else {
@@ -388,15 +392,12 @@ int main() {
                 f2 = 0;
             }
             // Используем дружественную функцию для отображения информации о игроке
-            printPlayerInfo(player);
+            printPlayerInfo(*player);
             if (f1 == 1) opponent->vivodrukabotaclose();
             else opponent->vivodrukabotaopen();
-            if (f1 == 0 && f2 == 0) player.vivodreza(&player, opponent);
+            if (f1 == 0 && f2 == 0) player->vivodreza(&*player, opponent);
         }
-        // Освобождение памяти
-        delete scorePtr;
-        delete opponent;
-
+        
         std::cout << "\nНажмите q, чтобы выйти или любую другую клавишу, чтобы сыграть заново\n";
     } while ((ch = _getch()) != 'q');
 }
